@@ -26,7 +26,7 @@ logger.remove()
 logger.add(log_file, rotation="1MiB", level="DEBUG", enqueue=True)
 ctypes.windll.kernel32.SetFileAttributesW(log_file, 0x02)  # Ukryj plik na Windows
 
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 RELASE_DATE = datetime(2026, 2, 19)
 
 
@@ -73,7 +73,7 @@ async def get_exe_from_repo():
     logger.info(f"Ściąganie EXE zakończone. Total size: {total}bytes")
 
 
-def is_new_version():
+def get_info_about_versions() -> tuple[bool, str, str]:
     web_version = get_latest_version_from_repo()
 
     if not os.path.exists(version_file_path):
@@ -87,7 +87,7 @@ def is_new_version():
     v1 = tuple(map(int, version_from_file.split(".")))
     v2 = tuple(map(int, web_version.split(".")))
 
-    return v2 > v1
+    return v2 > v1, version_from_file, web_version
 
 
 def kill_old_processes():
@@ -126,19 +126,23 @@ def run_exe():
         logger.error(f"Brak pliku {EXE_FILE} - nie uruchamiam\nBłąd {e}")
 
 
-def get_answer() -> bool:
-    answer = input("Jest dostępna nowa wersja. Pobrać? T/[N] -> ")
+def get_answer(version_from_file: str, web_version: str) -> bool:
+    print(f"Twoja wersja aplikacji:\t{version_from_file}")
+    print(f"Dostępna nowa wersja:\t{web_version}")
+    answer = input("Pobrać? T/[N] -> ")
     if answer.lower().strip() in ("t", "y"):
         return True
     return False
 
 
 async def main():
-    if not is_new_version():
+    is_new_version, version_from_file, web_version = get_info_about_versions()
+    if not is_new_version:
         run_exe()
+        logger.info("Kończę poprawnie z Exit 0")
         sys.exit(0)
 
-    if not get_answer():
+    if not get_answer(version_from_file, web_version):
         run_exe()
     else:
         await get_exe_from_repo()
@@ -148,5 +152,7 @@ async def main():
 
 
 if __name__ == "__main__":
+    logger.info(f"Uruchamiam wersję {VERSION}")
     asyncio.run(main())
     # kill_old_processes()
+    logger.info("Zakończono działanie poprawnie")
