@@ -20,13 +20,13 @@ EXE_LATEST = "JpkXmlReader_latest.exe"
 templates_path = os.path.join(base_path, "templates")
 version_file_path = os.path.join(templates_path, "version")
 exe_path = os.path.join(base_path, EXE_FILE)
-log_file = "logs_releasemanager.log"
+log_file = os.path.join(base_path, "logs_releasemanager.log")
 
 logger.remove()
 logger.add(log_file, rotation="1MiB", level="DEBUG", enqueue=True)
 ctypes.windll.kernel32.SetFileAttributesW(log_file, 0x02)  # Ukryj plik na Windows
 
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 RELASE_DATE = datetime(2026, 2, 19)
 
 
