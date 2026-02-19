@@ -1,3 +1,4 @@
+import ctypes
 from datetime import datetime
 from functools import lru_cache
 import shutil
@@ -19,10 +20,10 @@ EXE_LATEST = "JpkXmlReader_latest.exe"
 templates_path = os.path.join(base_path, "templates")
 version_file_path = os.path.join(templates_path, "version")
 exe_path = os.path.join(base_path, EXE_FILE)
-
-logger.add("logs.log", rotation="1MiB", level="DEBUG", enqueue=True)
-
-VERSION = "1.0.0"
+log_file = "logs_releasemanager.log"
+logger.add(log_file, rotation="1MiB", level="DEBUG", enqueue=True)
+ctypes.windll.kernel32.SetFileAttributesW(log_file, 0x02)  # Ukryj plik na Windows
+VERSION = "1.1.0"
 RELASE_DATE = datetime(2026, 2, 19)
 
 
