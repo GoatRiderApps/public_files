@@ -1,0 +1,43 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  APP_NAME: ReleaseManager
+
+dotenv: [".env"]
+
+tasks:
+  run:
+    desc: Uruchamia aplikację przy użyciu uv
+    cmds:
+      - uv run python app.py
+  set-version:
+    desc: Ustawia wersję pakietu w app.py
+    cmds:
+      - python set_version.py
+  build:
+    desc: Buduje pakiet przy użyciu uv
+    cmds:
+      - uv run pyinstaller.exe --icon images/icon.ico --onefile app.py --name {{.APP_NAME}}
+  format:
+    desc: Formatuje pliki źródłowe przy użyciu Ruff
+    cmds:
+      - uv run ruff format
+  create-release:
+    desc: Tworzy nową wersję release
+    cmds:
+      - mkdir releases || echo "Folder releases już istnieje"
+      - cp dist/{{.APP_NAME}}.exe releases/{{.APP_NAME}}_v${VERSION}.exe
+      - cp dist/{{.APP_NAME}}.exe releases/{{.APP_NAME}}_latest.exe
+  create-git-tag:
+    desc: Tworzy nowy tag Git dla bieżącej wersji
+    cmds:
+      - git tag -a ${VERSION} -m "Release ${VERSION}"
+      - git push --tags
+  all:
+    desc: Wykonuje wszystkie zadania
+    deps:
+      - set-version
+      - format
+      - build
