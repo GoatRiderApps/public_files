@@ -35,6 +35,11 @@ tasks:
     cmds:
       - git tag -a ${VERSION} -m "Release ${VERSION}"
       - git push --tags
+  create:
+    desc: Tworzy release i potem tag
+    deps:
+      - create-release
+      - create-git-tag
   all:
     desc: Wykonuje wszystkie zadania
     deps:

@@ -21,9 +21,12 @@ templates_path = os.path.join(base_path, "templates")
 version_file_path = os.path.join(templates_path, "version")
 exe_path = os.path.join(base_path, EXE_FILE)
 log_file = "logs_releasemanager.log"
+
+logger.remove()
 logger.add(log_file, rotation="1MiB", level="DEBUG", enqueue=True)
 ctypes.windll.kernel32.SetFileAttributesW(log_file, 0x02)  # Ukryj plik na Windows
-VERSION = "1.1.0"
+
+VERSION = "1.2.0"
 RELASE_DATE = datetime(2026, 2, 19)
 
 
@@ -117,7 +120,10 @@ def replace_execs():
 
 def run_exe():
     kill_old_processes()
-    subprocess.Popen(exe_path, close_fds=True)
+    try:
+        subprocess.Popen(exe_path, close_fds=True)
+    except Exception as e:
+        logger.error(f"Brak pliku {EXE_FILE} - nie uruchamiam\nBłąd {e}")
 
 
 def get_answer() -> bool:
